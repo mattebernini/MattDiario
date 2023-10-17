@@ -15,10 +15,11 @@ conn.close()
 
 # Display the retrieved data
 for row in rows:
-    id, title, datetime, content, category = row
+    id, title, datetime, content, category, sync = row
     print(f"ID: {id}")
     print(f"Title: {title}")
     print(f"Datetime: {datetime}")
     print(f"Content: {content}")
     print(f"Category: {category}")
+    print(f"sync: {sync}")
     print("-" * 30)

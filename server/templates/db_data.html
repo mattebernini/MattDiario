@@ -1,0 +1,18 @@
+<table class="table">
+    <thead>
+        <h1>MattDiario</h1>
+        <tr>
+    
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in diary_pages %}
+        <tr>
+            <h2>{{ entry.title }}</h2>
+            <p>Categoria: {{ entry.category }}</p>
+            <p>{{ entry.date }}</p>
+            <p>{{ entry.content }}</p>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>

@@ -1,121 +1,59 @@
 #:kivy 1.1.1
 
-ScreenManager:
-    id: screen_manager
+GridLayout:
+    cols: 1
 
-    ScriviScreen:
-        name: 'scrivi_screen'
+    Label:
+        text: 'MattDiario'
+        color: 0.98, 0.79, 0.14, 1
+        background_color: 0.07, 0.06, 0.25, 1
+        size_hint_y: 0.3 
 
-    LeggiScreen:
-        name: 'leggi_screen'
+    TextInput:
+        id: title
+        hint_text: 'Title'
+        size_hint_x: 1
+        size_hint_y: 0.3
 
-<ScriviScreen>:
+    TextInput:
+        id: date
+        hint_text: 'Datetime (default: current date and time)'
+        size_hint_x: 1
+        size_hint_y: 0.3
+
+    TextInput:
+        id: category
+        hint_text: 'Category'
+        size_hint_x: 1
+        size_hint_y: 0.3
+
+    ScrollView:
+        TextInput:
+            id: content
+            hint_text: 'Content'
+            multiline: True
+
     GridLayout:
-        cols: 1
+        cols: 3
+        size_hint_y: 0.5  
 
-        Label:
-            text: 'MattDiario'
-            color: 0.98, 0.79, 0.14, 1  # #f9ca24 color
-            background_color: 0.07, 0.06, 0.25, 1  # #130f40 color
-            size_hint_y: 0.3 
-
-        TextInput:
-            id: title
-            hint_text: 'Title'
-            text: root.pagina.title
-            on_text: root.pagina.title = self.text
-            size_hint_x: 1
-            size_hint_y: 0.3
-
-        TextInput:
-            id: date
-            hint_text: 'Datetime (default: current date and time)'
-            text: root.pagina.date
-            on_text: root.pagina.date = self.text
-            size_hint_x: 1
-            size_hint_y: 0.3
-
-        TextInput:
-            id: category
-            hint_text: 'Category'
-            text: root.pagina.category
-            on_text: root.pagina.category = self.text
-            size_hint_x: 1
-            size_hint_y: 0.3
-
-        ScrollView:
-            TextInput:
-                id: content
-                hint_text: 'Content'
-                text: root.pagina.content
-                on_text: root.pagina.content = self.text
-                multiline: True  # Allow multiple lines for the content
-       
-        GridLayout:
-            cols: 2
-            size_hint_y: 0.5  
-
-            Button:
-                text: 'Salva'
-                width: 100
-                background_color: 0.98, 0.79, 0.14, 1  # #f9ca24 color
-                color: 0.07, 0.06, 0.25, 1  # #130f40 color
-                on_release: root.save_pagina()
-
-            Button:
-                text: 'Leggi'
-                width: 100
-                background_color: 0.98, 0.79, 0.14, 1  # #f9ca24 color
-                color: 0.07, 0.06, 0.25, 1  # #130f40 color
-                on_release: app.root.current = 'leggi_screen'  # Switch to Leggi screen
-
-<LeggiScreen>:
-    GridLayout:
-        cols: 1
-
-        Label:
-            text: 'MattDiario'
-            color: 0.98, 0.79, 0.14, 1  # #f9ca24 color
-            background_color: 0.07, 0.06, 0.25, 1  # #130f40 color
-            size_hint_y: 0.3 
-
-        Label:
-            id: title
-            hint_text: 'Title'
-            text: root.pagina.title
-            on_text: root.pagina.title = self.text
-            size_hint_x: 1
-            size_hint_y: 0.3
-
-        Label:
-            id: date
-            hint_text: 'Datetime (default: current date and time)'
-            text: root.pagina.date
-            on_text: root.pagina.date = self.text
-            size_hint_x: 1
-            size_hint_y: 0.3
-
-        Label:
-            id: category
-            hint_text: 'Category'
-            text: root.pagina.category
-            on_text: root.pagina.category = self.text
-            size_hint_x: 1
-            size_hint_y: 0.3
-
-        ScrollView:
-            Label:
-                id: content
-                hint_text: 'Content'
-                text: root.pagina.content
-                on_text: root.pagina.content = self.text
-                multiline: True  # Allow multiple lines for the content
-    
         Button:
-            text: 'Scrivi'
+            text: 'Salva'
             width: 100
             background_color: 0.98, 0.79, 0.14, 1  # #f9ca24 color
             color: 0.07, 0.06, 0.25, 1  # #130f40 color
-            on_release: app.root.current = 'scrivi_screen'
-            size_hint_x: 1
-            size_hint_y: 0.5
+            on_press: app.save_pagina()
+
+        Button:
+            text: 'Leggi'
+            width: 100
+            background_color: 0.98, 0.79, 0.14, 1  # #f9ca24 color
+            color: 0.07, 0.06, 0.25, 1  # #130f40 color
+            on_press: app.leggi()
+
+        Button:
+            text: 'Sync'
+            width: 100
+            background_color: 0.98, 0.79, 0.14, 1  # #f9ca24 color
+            color: 0.07, 0.06, 0.25, 1  # #130f40 color
+            on_press: app.sincronizza()

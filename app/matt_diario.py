@@ -1,58 +1,81 @@
+import sqlite3
 from kivy.app import App
-from kivy.uix.boxlayout import BoxLayout
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
-from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.lang import Builder
 from datetime import datetime
-import sqlite3
+import webbrowser
+import requests
+import json
 
-class Pagina:
-    def __init__(self, title='', date=None, content='', category=''):
-        self.title = title
-        self.date = date
-        self.content = content
-        self.category = category
-
-class ScriviScreen(Screen):
-    def __init__(self, **kwargs):
-        current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        super(ScriviScreen, self).__init__(**kwargs)
-        self.pagina = Pagina(date=current_datetime)  # Create a Pagina instance with the default date
+class MattDiario(App):
+    def build(self):
+        self.title = "MattDiario"
+        self.root = Builder.load_file("matt_diario.kv")
+        # Initialize the date TextInput with the current date and time
+        self.root.ids.date.text = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        return self.root
 
     def save_pagina(self):
-        current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-        conn = sqlite3.connect('diary.db')
+        title = self.root.ids.title.text
+        date = self.root.ids.date.text
+        category = self.root.ids.category.text
+        content = self.root.ids.content.text
+
+        conn = sqlite3.connect("diary.db")
         cursor = conn.cursor()
+
         cursor.execute('''
-            INSERT INTO pagina (title, datetime, content, category)
-            VALUES (?, ?, ?, ?)
-        ''', (self.pagina.title, current_datetime, self.pagina.content, self.pagina.category))
+            CREATE TABLE IF NOT EXISTS pagina
+            (id INTEGER PRIMARY KEY, title TEXT, date TEXT, category TEXT, content TEXT, sync BOOLEAN DEFAULT 0)
+        ''')
+
+        cursor.execute('INSERT INTO pagina (title, date, category, content) VALUES (?, ?, ?, ?)',
+                       (title, date, category, content))
+
         conn.commit()
         conn.close()
-        # Clear the TextInput fields
-        self.ids.title.text = ""  # Clear the title field
-        self.ids.content.text = ""  # Clear the content field
-        self.ids.category.text = ""  # Clear the category field
-        
-class LeggiScreen(Screen):
-    def __init__(self, **kwargs):
-        conn = sqlite3.connect('diary.db')
+        self.clear()
+    
+    def clear(self):
+        # Clear the TextInput widgets after saving
+        self.root.ids.title.text = ''
+        self.root.ids.category.text = ''
+        self.root.ids.content.text = ''
+
+    def leggi(self):
+        url = "http://localhost/"
+        webbrowser.open(url)
+
+    def sincronizza(self):
+        # Fetch rows with sync=False from the Kivy app's database
+        conn = sqlite3.connect("diary.db")
         cursor = conn.cursor()
-
-        # Retrieve the most recent diary entry from the "pagina" table
-        cursor.execute('SELECT * FROM pagina ORDER BY datetime DESC LIMIT 1')
-        most_recent_entry = cursor.fetchone()
+        cursor.execute("SELECT * FROM pagina WHERE sync = 0")
+        rows = cursor.fetchall()
         conn.close()
-        id, title, datetime, content, category = most_recent_entry
-        super(LeggiScreen, self).__init__(**kwargs)
-        self.pagina = Pagina(title, datetime, content, category)
 
-class MattDiarioApp(App):
-    def build(self):
-        self.title = 'MattDiario'
-        return Builder.load_file('matt_diario.kv')
+        for row in rows:
+            data = {
+                "title": row[1],
+                "date": row[2],
+                "category": row[3],
+                "content": row[4]
+            }
+
+            # Send data to the Flask server
+            response = requests.post("http://localhost:5000/api/send", json=data)
+
+            if response.status_code == 200:
+                print(f"Page '{data['title']}' sent successfully")
+                # Update the sync status in the Kivy app's database
+                conn = sqlite3.connect("diary.db")
+                cursor = conn.cursor()
+                cursor.execute("UPDATE pagina SET sync = 1 WHERE id = ?", (row[0],))
+                conn.commit()
+                conn.close()
+            else:
+                print(f"Failed to send page '{data['title']}'")
+
+    
 
 if __name__ == '__main__':
-    MattDiarioApp().run()
+    MattDiario().run()
