@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
@@ -48,12 +49,25 @@ def get_diary_pages_json(diary_entries):
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    categories = db.session.query(DiaryEntry.category, func.count(DiaryEntry.id)).group_by(DiaryEntry.category).all()  
+    year_month = db.session.query(
+        func.strftime("%Y-%m", DiaryEntry.date).label("year_month"),
+        func.count(DiaryEntry.id)
+    ).group_by("year_month").all() 
+    return render_template('index.html',
+                           categories=categories,
+                           year_month=year_month)
 
 @app.route('/pagina/<quale>')
 def pagina(quale):
     if quale == "ultima":
         diary_entries = DiaryEntry.query.all()
+    else:
+        tipo, val = quale.split("=")
+        if tipo == "category":
+            diary_entries = DiaryEntry.query.filter_by(category=val).all()
+        elif tipo == "year_month":
+            diary_entries = DiaryEntry.query.filter(DiaryEntry.date.like(f"{val}%")).all()
 
     return render_template('pagina.html', 
                            diary_pages=get_diary_pages_json(diary_entries))

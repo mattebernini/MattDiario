@@ -6,17 +6,19 @@
     {% set current_index = diary_pages|length - 1 %}
     <h3>{{ diary_pages[current_index].title }}</h3>
     <p id="category">{{ diary_pages[current_index].category }}</p>
-    <p id="date">{{ diary_pages[current_index].date }}</p>
+    <strong id="date">{{ diary_pages[current_index].date }}</strong>
     <p id="content">{{ diary_pages[current_index].content }}</p>
 
     <input type="hidden" id="current_index" value="{{ current_index }}">
-    <div class="btn-group" role="group">
-        <button type="button" class="btn btn-secondary mr-4" onclick="changeIndex(-1)">Indietro</button>
-        <button type="button" class="btn btn-secondary" onclick="changeIndex(1)">Avanti</button>
+    <div class=" container fixed-bottom mb-5">
+        <div class="fixed-bottom mb-5 d-flex justify-content-between">
+            <button type="button" class="btn btn-secondary btn-lg" onclick="changeIndex(1)">&#8592;</button>
+            <button type="button" class="btn btn-secondary btn-lg" onclick="changeIndex(-1)">&#8594;</button>
+        </div>
+        <a href="/">
+            <button type="button" class="btn btn-primary btn-lg btn-block mt-2">Index</button>
+        </a>
     </div>
-    <a href="/">
-        <button type="button" class="btn btn-primary btn-lg btn-block mt-5">Index</button>
-    </a>
 </div>
 <script>
     var diary_pages = {{ diary_pages|tojson|safe }};

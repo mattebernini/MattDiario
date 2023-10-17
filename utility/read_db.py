@@ -1,7 +1,7 @@
 import sqlite3
 
 # Connect to the SQLite database
-conn = sqlite3.connect('diary.db')
+conn = sqlite3.connect('app/diary.db')
 cursor = conn.cursor()
 
 # Execute a SELECT query to retrieve data from the "pagina" table
