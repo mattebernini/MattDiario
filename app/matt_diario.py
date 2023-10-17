@@ -45,6 +45,7 @@ class MattDiario(App):
 
     def leggi(self):
         url = os.getenv("LEGGI_URL")
+        url = "http://localhost:5000"
         webbrowser.open(url)
 
     def sincronizza(self):

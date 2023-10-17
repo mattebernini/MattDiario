@@ -1,3 +1,5 @@
+<link href="{{ url_for('static',filename='bootstrap.css') }}" rel="stylesheet">
+
 <table class="table">
     <thead>
         <h1>MattDiario</h1>
@@ -16,3 +18,7 @@
         {% endfor %}
     </tbody>
 </table>
+
+<a href="/">
+    <button type="button" class="btn btn-primary btn-lg btn-block">Index</button>
+</a>

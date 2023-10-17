@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -32,10 +32,45 @@ def receive_page():
 
     return jsonify(success=True)
 
+# frontend
+
+def get_diary_pages_json(diary_entries):
+    diary_pages = []
+    
+    for entry in diary_entries:
+        diary_pages.append({
+            'title': entry.title,
+            'category': entry.category,
+            'date': entry.date,
+            'content': entry.content
+        })
+    return diary_pages
+
 @app.route('/')
 def index():
+    return render_template('index.html')
+
+@app.route('/pagina/<quale>')
+def pagina(quale):
+    if quale == "ultima":
+        diary_entries = DiaryEntry.query.all()
+
+    return render_template('pagina.html', 
+                           diary_pages=get_diary_pages_json(diary_entries))
+
+@app.route('/delete_category', methods=['GET', 'POST'])
+def delete_category():
+    if request.method == 'POST':
+        category_to_delete = request.form.get('category')
+        DiaryEntry.query.filter_by(category=category_to_delete).delete()
+        db.session.commit()
+    return redirect(url_for('index'))
+
+
+@app.route('/db_grezzo')
+def db_grezzo():
     diary_pages = DiaryEntry.query.all()
-    return render_template('db_data.html', diary_pages=diary_pages)
+    return render_template('db_grezzo.html', diary_pages=diary_pages)
 
 if __name__ == '__main__':
     app.run(debug=True)
