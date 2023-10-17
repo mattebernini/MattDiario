@@ -4,10 +4,12 @@ from kivy.lang import Builder
 from datetime import datetime
 import webbrowser
 import requests
-import json
+import os
+from dotenv import load_dotenv
 
 class MattDiario(App):
     def build(self):
+        load_dotenv()
         self.title = "MattDiario"
         self.root = Builder.load_file("matt_diario.kv")
         # Initialize the date TextInput with the current date and time
@@ -42,7 +44,7 @@ class MattDiario(App):
         self.root.ids.content.text = ''
 
     def leggi(self):
-        url = "http://localhost/"
+        url = os.getenv("LEGGI_URL")
         webbrowser.open(url)
 
     def sincronizza(self):

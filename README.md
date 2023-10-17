@@ -9,4 +9,4 @@ The server is made using Flask and it shows the diary pages that you have syncro
 
 ## Can I use it?
 
-Yes! You only need to chang the urls to your private server and it's done!
+Yes! You only need to chang the urls in .env files to your private server and it's done!
