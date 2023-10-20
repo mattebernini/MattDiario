@@ -65,7 +65,9 @@ class MattDiario(App):
             }
 
             # Send data to the Flask server
-            response = requests.post("http://localhost:5000/api/send", json=data)
+            url = os.getenv("SEND_URL")
+            url = "http://localhost:5000/api/send"
+            response = requests.post(url, json=data)
 
             if response.status_code == 200:
                 print(f"Page '{data['title']}' sent successfully")
