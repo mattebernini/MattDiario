@@ -85,7 +85,35 @@ class MattDiario(App):
             else:
                 print(f"Failed to send page '{data['title']}'")
 
-    
+    def backup(self):
+        conn = sqlite3.connect("diary.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM pagina")
+        rows = cursor.fetchall()
+        conn.close()
+
+        # Encrypt content
+        fernet = Fernet(os.getenv("PRIVATE_KEY"))
+
+        for row in rows:
+            data = {
+                "title": row[1],
+                "date": row[2],
+                "category": row[3],
+                "content": fernet.encrypt(bytes(row[4], encoding='utf8')).decode()
+            }
+            print(data)
+
+            # Send data to the Flask server
+            url = os.getenv("BACKUP_URL")
+            url = "http://localhost:5000/api/backup"
+            response = requests.post(url, json=data)
+
+            if response.status_code == 200:
+                print(f"Page '{data['title']}' sent successfully")
+            else:
+                print(f"Failed to send page '{data['title']}'")
+
 
 if __name__ == '__main__':
     MattDiario().run()

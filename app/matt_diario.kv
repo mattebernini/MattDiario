@@ -34,7 +34,7 @@ GridLayout:
             multiline: True
 
     GridLayout:
-        cols: 3
+        cols: 4 
         size_hint_y: 0.5  
 
         Button:
@@ -57,3 +57,10 @@ GridLayout:
             background_color: 0.98, 0.79, 0.14, 1  # #f9ca24 color
             color: 0.07, 0.06, 0.25, 1  # #130f40 color
             on_press: app.sincronizza()
+
+        Button:
+            text: 'Backup'
+            width: 100
+            background_color: 0.98, 0.79, 0.14, 1  # #f9ca24 color
+            color: 0.07, 0.06, 0.25, 1  # #130f40 color
+            on_press: app.backup()

@@ -38,6 +38,23 @@ def receive_page():
 
     return jsonify(success=True)
 
+@app.route('/api/backup', methods=['POST'])
+def backup():
+    data = request.get_json()
+    print(data)
+    entry = DiaryEntry(
+        title=data['title'],
+        date=data['date'],
+        category=data['category'],
+        content=data['content']     # encrypted
+    )
+    diary_entries = DiaryEntry.query(DiaryEntry.date).all()
+    if entry.date not in diary_entries:    
+        db.session.add(entry)
+        db.session.commit()
+
+    return jsonify(success=True)
+
 # frontend
 
 def get_diary_pages_json(diary_entries):
