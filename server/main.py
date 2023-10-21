@@ -1,10 +1,15 @@
 from flask import Flask, render_template, request, jsonify, redirect, url_for
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
+from dotenv import load_dotenv
+from cryptography.fernet import Fernet
+import os 
 
+load_dotenv()
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "sqlite:///database.db"
 db = SQLAlchemy(app)
+fernet = Fernet(os.getenv("PRIVATE_KEY"))
 
 class DiaryEntry(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -25,7 +30,7 @@ def receive_page():
         title=data['title'],
         date=data['date'],
         category=data['category'],
-        content=data['content']
+        content=data['content']     # encrypted
     )
 
     db.session.add(entry)
@@ -43,7 +48,7 @@ def get_diary_pages_json(diary_entries):
             'title': entry.title,
             'category': entry.category,
             'date': entry.date,
-            'content': entry.content
+            'content': fernet.decrypt(bytes(entry.content, encoding='utf8')).decode()
         })
     return diary_pages
 

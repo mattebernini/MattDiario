@@ -6,6 +6,7 @@ import webbrowser
 import requests
 import os
 from dotenv import load_dotenv
+from cryptography.fernet import Fernet
 
 class MattDiario(App):
     def build(self):
@@ -56,13 +57,17 @@ class MattDiario(App):
         rows = cursor.fetchall()
         conn.close()
 
+        # Encrypt content
+        fernet = Fernet(os.getenv("PRIVATE_KEY"))
+
         for row in rows:
             data = {
                 "title": row[1],
                 "date": row[2],
                 "category": row[3],
-                "content": row[4]
+                "content": fernet.encrypt(bytes(row[4], encoding='utf8')).decode()
             }
+            print(data)
 
             # Send data to the Flask server
             url = os.getenv("SEND_URL")
